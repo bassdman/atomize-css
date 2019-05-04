@@ -9,10 +9,11 @@ const { stylesCSSStrategy,
     stylesAfterCurrentStrategy
  } = require("./outputStrategies");
 
+const basicRules = require('./rules/rules_basic');
 const { HTMLTemplate } = require("./HTMLTemplate");
 
 const fs = require('fs-extra');
-
+const path = require('path');
 
 module.exports = function (config = {}) {
     if (config.src == undefined)
@@ -27,19 +28,14 @@ module.exports = function (config = {}) {
     const content = fs.readFileSync(config.src, 'UTF-8');
     const template = new HTMLTemplate(content, config);
 
-    template.setVar('styletagidentifier', 'atomiccss_' + (Math.random().toString(36).substring(7)));
-
-
-
+    template.addRules(basicRules);
     template.addRules(config.rules);
-
-    console.log(template.getMatches())
-    console.log(template.html());
 
     const matches = template.getMatches();
     let output = getOutput(matches, config.outputStrategy, template);
 
-    console.log(output);
+    if(config.dest)
+        writeOutputToFile(config.dest,output);
 }
 
 function getOutput(matches, output, template) {
@@ -58,4 +54,9 @@ function getOutput(matches, output, template) {
         case 'htmltag_afterelem': return stylesAfterCurrentStrategy(matches, template, template.$); break;
         default: throw new Error('outputStrategy ' + config.outputStrategy + ' does not exist. Choose an existing one.')
     }
+}
+
+function writeOutputToFile(filepath,output){
+    fs.ensureDirSync(path.dirname(filepath));
+    fs.outputFileSync(filepath,output);
 }

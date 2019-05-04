@@ -5,7 +5,6 @@ const { parseStyle } = require("./parseStyle");
 
 function HTMLTemplate(content, config = {}) {
     const $ = cheerio.load(content);
-    const variables = {};
     const rules = {};
 
     return {
@@ -13,54 +12,93 @@ function HTMLTemplate(content, config = {}) {
             return $.html(':root');
         },
         $: $,
-        matchesRule: function (selectorRaw) {
+        matchedClasses: function (selectorRaw) {
             //notwendig, da sonst $(selectorRaw einen Fehler wirft)
             const selector = '.' + escapeSelector(selectorRaw);
 
             if ($(selector).length > 0)
-                return true;
+                return $(selector);
 
             const cleanedSelector = selector.replace(/(\.|\\|\(.*\))/g, "") + '(';
             const attrSelector = `[class^="${cleanedSelector}"],[class*=" ${cleanedSelector}"]`;
-            return $(attrSelector).length > 0
+            return $(attrSelector);
         },
-        getMatches: function(){
+        getMatches: function () {
             const stylesParsed = [];
 
-            Object.keys(rules).forEach(selector => {        
-                if (this.matchesRule(selector))
-                {    
-                    const style = rules[selector];
-                    console.log('use selector' + selector)
-                    stylesParsed.push( {
-                         style: parseStyle(style, selector) || '',
-                         selectorRule: selector,
-                         found: 'found'
+            Object.keys(rules).forEach(selector => {
+                const matches = this.matchedClasses(selector)
+                if (matches.length <= 0)
+                    return;
+
+                matches.each(function (match) {
+                    const classList = $(this).attr('class').split(/\s+/);
+                    const matchingClass = classList.map(cls => {
+                        const parametersUserclass = cls.includes(')') ? cls.replace(/.*\((.*)\)/, "$1").split(',') : [];
+                        const parametersTemplate = selector.includes(')') ? selector.replace(/.*\((.*)\)/, "$1").split(',') : [];
+                        const classnameUserclass = cls.replace(/\(.*\)/, '');
+                        const classnameTemplate = selector.replace(/\(.*\)/, '');
+                        const stylesheetSelector = escapeSelector(cls);
+                        const match = parametersUserclass.length == parametersTemplate.length
+                            && classnameUserclass == classnameTemplate;
+
+                        const parameters = {};
+
+                        if(match)
+                        {
+                            for(i in parametersTemplate){
+                                const key = parametersTemplate[i];
+
+                                if(!key.startsWith('#'))
+                                    throw new Error('Rule "'+selector+'": Parameters of a rule must start with a #. Example: "aselector(#param1,#param2)"');
+                                
+                                const value = parametersUserclass[i];
+                                parameters[key] = value;
+                            }
+                        }
+
+                        return {
+                            userclass: cls,
+                            rule: selector,
+                            parametersUserclass,
+                            parametersTemplate,
+                            classnameUserclass,
+                            classnameTemplate,
+                            stylesheetSelector,
+                            match,
+                            parameters
+                        }
                     })
-                }
+                        .filter(metadata => metadata.match)
+                        .forEach(metadata => {
+                            console.log(metadata)
+                            const style = rules[selector];
+                            stylesParsed.push({
+                                style: parseStyle(style, selector,metadata) || '',
+                                matchingRule: selector,
+                                found: metadata.userclass,
+                                params: metadata.parameters
+                            })
+                        });
+
+                })
             })
             return stylesParsed;
         },
-        addRules: function(newRules){
-            if(newRules == undefined)
+        addRules: function (newRules) {
+            if (newRules == undefined)
                 throw new Error('HTMLTemplate.addRules(rules): rules is null');
-            
-            if(! typeof newRules === 'object')
+
+            if (! typeof newRules === 'object')
                 throw new Error('HTMLTemplate.addRules(rules): rules must be an object {}.')
 
-            Object.assign(rules,newRules);
-        },
-        getVar(name) {
-            return variables[name];
-        },
-        setVar(name, value) {
-            return variables[name] = value;
+            Object.assign(rules, newRules);
         }
     };
 }
 
 function escapeSelector(selector) {
-    return selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return selector.replace(/[.*+?^${}()|[\]\\,]/g, '\\$&');
 }
 
 exports.HTMLTemplate = HTMLTemplate;
