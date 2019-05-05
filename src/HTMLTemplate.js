@@ -1,7 +1,5 @@
 const cheerio = require('cheerio');
-
-const { parseStyle } = require("./parseStyle");
-
+const CLASSNAME_PLACEHOLDER = '#selector';
 
 function HTMLTemplate(content, config = {}) {
     const $ = cheerio.load(content);
@@ -71,7 +69,6 @@ function HTMLTemplate(content, config = {}) {
                     })
                         .filter(metadata => metadata.match)
                         .forEach(metadata => {
-                            console.log(metadata)
                             const style = rules[selector];
                             stylesParsed.push({
                                 style: parseStyle(style, selector,metadata) || '',
@@ -98,7 +95,16 @@ function HTMLTemplate(content, config = {}) {
 }
 
 function escapeSelector(selector) {
-    return selector.replace(/[.*+?^${}()|[\]\\,]/g, '\\$&');
+    return selector.replace(/[.*+?^${}()|[\]\\,\'\"]/g, '\\$&');
+}
+
+function parseStyle(style, classname, metadata) {
+    let styleParsed = style.includes('{') ? style.replace(CLASSNAME_PLACEHOLDER, metadata.stylesheetSelector) : `.${metadata.stylesheetSelector}{${style}}`
+
+    for (key of Object.keys(metadata.parameters)) {
+        styleParsed = styleParsed.replace(new RegExp(key, 'g'), metadata.parameters[key]);
+    }
+    return styleParsed;
 }
 
 exports.HTMLTemplate = HTMLTemplate;

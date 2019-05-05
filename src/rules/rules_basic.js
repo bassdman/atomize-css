@@ -1,8 +1,9 @@
 module.exports = {
     'margin(#param)': 'margin: #param',
-  //  displayNone: 'display:none;',
-    widthabc: '.widthabc{width:5px}',
-  //  aligncenter: '.#selector{width:5px}',
+    displayNone: 'display:none;',
     'width(#width)': '.#selector{width: #width;}',
-    'width(#width,#margin)': 'width: #width; margin: #margin;',
+    'content(#content)': 'content: "#content"',
+    'bg(#color)': 'background: #color;',
+    'c(#color)': 'color: #color',
+    'padding(#padding)': 'padding: #padding'
 }
