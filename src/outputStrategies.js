@@ -5,7 +5,6 @@ exports.stylesCSSStrategy = stylesCSSStrategy;
 
 
 function stylesEndStrategy(matches, template, $) {
-    console.log(matches)
     const cssrules = matches.map(match => match.style).join('');
     const parentElem = $('body') ? $('body') : $(':root');
     $(parentElem).append(`<style>${cssrules}</style>`);

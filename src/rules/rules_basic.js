@@ -5,5 +5,6 @@ module.exports = {
     'content(#content)': 'content: "#content"',
     'bg(#color)': 'background: #color;',
     'c(#color)': 'color: #color',
-    'padding(#padding)': 'padding: #padding'
+    'padding(#padding)': 'padding: #padding',
+    displayBlock: 'display:block;'
 }

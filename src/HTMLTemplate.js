@@ -17,7 +17,8 @@ function HTMLTemplate(content, config = {}) {
             if ($(selector).length > 0)
                 return $(selector);
 
-            const cleanedSelector = selector.replace(/(\.|\\|\(.*\))/g, "") + '(';
+            const endCharacter = selector.includes('(') ? '(': ':';
+            const cleanedSelector = selector.replace(/(\.|\\|\(.*\)|\:.*)/g, "") + endCharacter;
             const attrSelector = `[class^="${cleanedSelector}"],[class*=" ${cleanedSelector}"]`;
             return $(attrSelector);
         },
@@ -29,14 +30,16 @@ function HTMLTemplate(content, config = {}) {
                 if (matches.length <= 0)
                     return;
 
+                    console.log('matches')
                 matches.each(function (match) {
                     const classList = $(this).attr('class').split(/\s+/);
                     const matchingClass = classList.map(cls => {
-                        const parametersUserclass = cls.includes(')') ? cls.replace(/.*\((.*)\)/, "$1").split(',') : [];
+                        const pseudoSelector = cls.replace(/.*\:/,':').includes(':') ? cls.replace(/.*\:/,':') : '';
+                        const parametersUserclass = cls.includes(')') ? cls.replace(/.*\((.*)\)/, "$1").replace(pseudoSelector,'').split(',') : [];
                         const parametersTemplate = selector.includes(')') ? selector.replace(/.*\((.*)\)/, "$1").split(',') : [];
-                        const classnameUserclass = cls.replace(/\(.*\)/, '');
+                        const classnameUserclass = cls.replace(/\(.*\)/, '').replace(pseudoSelector,'');
                         const classnameTemplate = selector.replace(/\(.*\)/, '');
-                        const stylesheetSelector = escapeSelector(cls);
+                        const stylesheetSelector = escapeSelector(cls) + pseudoSelector;
                         const match = parametersUserclass.length == parametersTemplate.length
                             && classnameUserclass == classnameTemplate;
 
@@ -55,7 +58,7 @@ function HTMLTemplate(content, config = {}) {
                             }
                         }
 
-                        return {
+                        const retVal = {
                             userclass: cls,
                             rule: selector,
                             parametersUserclass,
@@ -64,8 +67,12 @@ function HTMLTemplate(content, config = {}) {
                             classnameTemplate,
                             stylesheetSelector,
                             match,
-                            parameters
+                            parameters,
+                            pseudoSelector
                         }
+
+                        console.log(retVal);
+                        return retVal;
                     })
                         .filter(metadata => metadata.match)
                         .forEach(metadata => {
@@ -95,11 +102,11 @@ function HTMLTemplate(content, config = {}) {
 }
 
 function escapeSelector(selector) {
-    return selector.replace(/[.*+?^${}()|[\]\\,\'\"]/g, '\\$&');
+    return selector.replace(/[.*+?^${}()|[\]\\,\'\":]/g, '\\$&');
 }
 
 function parseStyle(style, classname, metadata) {
-    let styleParsed = style.includes('{') ? style.replace(CLASSNAME_PLACEHOLDER, metadata.stylesheetSelector) : `.${metadata.stylesheetSelector}{${style}}`
+    let styleParsed = style.includes('{') ? style.replace(CLASSNAME_PLACEHOLDER, metadata.stylesheetSelector+metadata.pseudoSelector) : `.${metadata.stylesheetSelector}{${style}}`
 
     for (key of Object.keys(metadata.parameters)) {
         styleParsed = styleParsed.replace(new RegExp(key, 'g'), metadata.parameters[key]);
