@@ -1,21 +1,24 @@
-const { stylesCSSStrategy, 
-    stylesEndStrategy, 
-    stylesStartStrategy, 
+const fs = require('fs-extra');
+const path = require('path');
+
+
+const { stylesCSSStrategy,
+    stylesEndStrategy,
+    stylesStartStrategy,
     stylesHeadStartStrategy,
     stylesHeadEndStrategy,
     stylesBodyStartStrategy,
     stylesBodyEndStrategy,
     stylesBeforeCurrentStrategy,
     stylesAfterCurrentStrategy
- } = require("./outputStrategies");
+} = require("./outputStrategies");
 
-const basicRules = require('./rules/rules_basic');
+const basicRulesFile = require('./rules/rules_basic');
+const RulesParser = require('./RulesParser');
 const { HTMLTemplate } = require("./HTMLTemplate");
 
-const fs = require('fs-extra');
-const path = require('path');
-
-module.exports = function (config = {}) {
+const rulesParser = new RulesParser();
+module.exports = async function (config = {}) {
     if (config.src == undefined)
         throw new Error('src is undefined');
 
@@ -25,17 +28,25 @@ module.exports = function (config = {}) {
     };
     config = Object.assign({}, defaults, config);
 
-    const content = fs.readFileSync(config.src, 'UTF-8');
+    const content = await fs.readFile(config.src, 'UTF-8');
     const template = new HTMLTemplate(content, config);
 
-    template.addRules(basicRules);
-    template.addRules(config.rules);
+    Promise.all([rulesParser.parse(basicRulesFile), rulesParser.parse(config.rules)])
+        .then(rules => {
+            console.log(rules)
+            template.addRules(rules[0]);
+            template.addRules(rules[1]);
+            const matches = template.getMatches();
+            let output = getOutput(matches, config.outputStrategy, template);
 
-    const matches = template.getMatches();
-    let output = getOutput(matches, config.outputStrategy, template);
+            if (config.dest)
+                writeOutputToFile(config.dest, output);
+        })
+        .catch(err => {
+            console.log(err)
+        });
 
-    if(config.dest)
-        writeOutputToFile(config.dest,output);
+
 }
 
 function getOutput(matches, output, template) {
@@ -56,7 +67,8 @@ function getOutput(matches, output, template) {
     }
 }
 
-function writeOutputToFile(filepath,output){
+function writeOutputToFile(filepath, output) {
     fs.ensureDirSync(path.dirname(filepath));
-    fs.outputFileSync(filepath,output);
+    fs.outputFileSync(filepath, output);
 }
+

@@ -1,3 +1,5 @@
+const { escapeSelector } = require("./escapeSelector");
+
 const cheerio = require('cheerio');
 const CLASSNAME_PLACEHOLDER = '#selector';
 
@@ -30,7 +32,6 @@ function HTMLTemplate(content, config = {}) {
                 if (matches.length <= 0)
                     return;
 
-                    console.log('matches')
                 matches.each(function (match) {
                     const classList = $(this).attr('class').split(/\s+/);
                     const matchingClass = classList.map(cls => {
@@ -49,9 +50,8 @@ function HTMLTemplate(content, config = {}) {
                         {
                             for(i in parametersTemplate){
                                 const key = parametersTemplate[i];
-
-                                if(!key.startsWith('#'))
-                                    throw new Error('Rule "'+selector+'": Parameters of a rule must start with a #. Example: "aselector(#param1,#param2)"');
+                                if(!key.startsWith('@'))
+                                    throw new Error('Rule "'+selector+'": Parameters of a rule must start with a . Example: "aselector(@param1,@param2)"');
                                 
                                 const value = parametersUserclass[i];
                                 parameters[key] = value;
@@ -71,7 +71,6 @@ function HTMLTemplate(content, config = {}) {
                             pseudoSelector
                         }
 
-                        console.log(retVal);
                         return retVal;
                     })
                         .filter(metadata => metadata.match)
@@ -93,16 +92,12 @@ function HTMLTemplate(content, config = {}) {
             if (newRules == undefined)
                 throw new Error('HTMLTemplate.addRules(rules): rules is null');
 
-            if (! typeof newRules === 'object')
-                throw new Error('HTMLTemplate.addRules(rules): rules must be an object {}.')
+            if (! typeof newRules === 'string')
+                throw new Error('HTMLTemplate.addRules(rules): rules must be a string.')
 
             Object.assign(rules, newRules);
         }
     };
-}
-
-function escapeSelector(selector) {
-    return selector.replace(/[.*+?^${}()|[\]\\,\'\":]/g, '\\$&');
 }
 
 function parseStyle(style, classname, metadata) {

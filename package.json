@@ -1,6 +1,6 @@
 {
   "name": "atomize-css",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Parse classes in html - no more large css-files",
   "main": "src/index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/bassdman/atomize-css#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
-    "fs-extra": "^7.0.1"
+    "fs-extra": "^7.0.1",
+    "less": "^3.9.0"
   }
 }
