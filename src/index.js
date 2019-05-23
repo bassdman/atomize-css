@@ -23,6 +23,7 @@ module.exports = async function (config = {}) {
         throw new Error('src is undefined');
 
     const defaults = {
+        rules: '',
         transform: {},
         outputStrategy: 'htmltag_end'
     };
