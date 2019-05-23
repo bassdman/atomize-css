@@ -1,5 +1,5 @@
 {
-  "name": "atomize-css",
+  "name": "cssar",
   "version": "0.1.0",
   "description": "Parse classes in html - no more large css-files",
   "main": "src/index.js",
@@ -8,20 +8,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bassdman/atomize-css.git"
+    "url": "git+https://github.com/bassdman/cssar.git"
+  },
+  "bin": {
+    "cssar": "./bin/index.js"
   },
   "keywords": [
     "atomize",
     "atomizer",
     "css",
-    "atomize-css"
+    "atomize-css",
+    "cäsar"
   ],
   "author": "Manuel Gelsen",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bassdman/atomize-css/issues"
+    "url": "https://github.com/bassdman/cssar/issues"
   },
-  "homepage": "https://github.com/bassdman/atomize-css#readme",
+  "homepage": "https://github.com/bassdman/cssar#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "fs-extra": "^7.0.1",
