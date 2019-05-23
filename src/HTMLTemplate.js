@@ -14,8 +14,9 @@ function HTMLTemplate(content, config = {}) {
         $: $,
         matchedClasses: function (selectorRaw) {
             //notwendig, da sonst $(selectorRaw einen Fehler wirft)
-            const selector = '.' + escapeSelector(selectorRaw);
+            const selector = getSelector(selectorRaw,$);
 
+            console.log('selector',selectorRaw)
             if ($(selector).length > 0)
                 return $(selector);
 
@@ -110,3 +111,16 @@ function parseStyle(style, classname, metadata) {
 }
 
 exports.HTMLTemplate = HTMLTemplate;
+
+function getSelector(selectorRaw,$){
+    let selector = '.' + escapeSelector(selectorRaw);
+    try{
+        $(selector)
+        return selector;
+    }
+    catch(e){
+        selector = selector.replace(/.*;/,'');
+        $(selector)
+        return selector;
+    }
+}

@@ -33,7 +33,6 @@ module.exports = async function (config = {}) {
 
     Promise.all([rulesParser.parse(basicRulesFile), rulesParser.parse(config.rules)])
         .then(rules => {
-            console.log(rules)
             template.addRules(rules[0]);
             template.addRules(rules[1]);
             const matches = template.getMatches();
@@ -53,6 +52,7 @@ function getOutput(matches, output, template) {
     if (typeof output == 'function')
         return output.apply(this, [matches, template, template.$])
 
+    
     switch (output) {
         case 'css': return stylesCSSStrategy(matches, template, template.$); break;
         case 'htmltag_end': return stylesEndStrategy(matches, template, template.$); break;

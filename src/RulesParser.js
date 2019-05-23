@@ -14,7 +14,7 @@ function RulesParser() {
                         .forEach(match => {
                             const selector = match.split('{')[0].replace('\\n','').replace(/[\s\.]/g,'');
                             if(selector != '}')
-                            rulesOutput[selector] = escapeSelectorLight(match).replace(/\s*/g,'');
+                            rulesOutput[selector] = escapeSelectorLight(match);
                         })
                     return rulesOutput;
                 })

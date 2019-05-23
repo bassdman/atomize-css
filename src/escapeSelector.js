@@ -4,6 +4,6 @@ function escapeSelector(selector) {
 exports.escapeSelector = escapeSelector;
 
 function escapeSelectorLight(selector){
-    return selector.replace(/[()]/g, '\\$&');
+    return selector.replace(/[(),]/g, '\\$&');
 }
 exports.escapeSelectorLight = escapeSelectorLight;
