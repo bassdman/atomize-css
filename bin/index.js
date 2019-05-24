@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 const path = require('path');
-console.log(process.argv)
 let config = {};
 //keine Parameter
 if(process.argv.length == 2)
@@ -15,10 +14,12 @@ else if(process.argv.length == 3)
 {
     config = require(path.join(process.cwd(),process.argv[2]));
 }
-else if(process.argv.length == 2)
+else if(process.argv.length == 4)
 {
-    config.src = path.join(process.cwd(),process.argv[2]);
-    config.dest = path.join(process.cwd(),process.argv[3]);
+    config = {
+        src:  path.join(process.cwd(),process.argv[2]),
+        dest: path.join(process.cwd(),process.argv[3])
+    }
 }
 else if(process.argv.length == 5)
 {
