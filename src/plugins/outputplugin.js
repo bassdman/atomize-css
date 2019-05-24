@@ -1,17 +1,9 @@
-function stylesCSSStrategy(matches, template, $) {
-    return matches.map(match => match.style).join('');
-}
-exports.stylesCSSStrategy = stylesCSSStrategy;
-
-
 function stylesEndStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
     const parentElem = $('body') ? $('body') : $(':root');
     $(parentElem).append(`<style>${cssrules}</style>`);
     return $.html(':root');
 }
-exports.stylesEndStrategy = stylesEndStrategy;
-
 
 function stylesStartStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -20,8 +12,6 @@ function stylesStartStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesStartStrategy = stylesStartStrategy;
-
 
 function stylesHeadStartStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -29,8 +19,6 @@ function stylesHeadStartStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesHeadStartStrategy = stylesHeadStartStrategy;
-
 
 function stylesHeadEndStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -38,8 +26,6 @@ function stylesHeadEndStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesHeadEndStrategy = stylesHeadEndStrategy;
-
 
 function stylesBodyStartStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -47,8 +33,6 @@ function stylesBodyStartStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesBodyStartStrategy = stylesBodyStartStrategy;
-
 
 function stylesBodyEndStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -56,8 +40,6 @@ function stylesBodyEndStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesBodyEndStrategy = stylesBodyEndStrategy;
-
 
 function stylesBeforeCurrentStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -65,8 +47,6 @@ function stylesBeforeCurrentStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesBeforeCurrentStrategy = stylesBeforeCurrentStrategy;
-
 
 function stylesAfterCurrentStrategy(matches, template, $) {
     const cssrules = matches.map(match => match.style).join('');
@@ -74,5 +54,17 @@ function stylesAfterCurrentStrategy(matches, template, $) {
 
     return $.html(':root');
 }
-exports.stylesAfterCurrentStrategy = stylesAfterCurrentStrategy;
 
+exports.outputplugin = function({matches,template,$,css,outputEntry}) {
+    switch (outputEntry) {
+        case 'htmltag_end': return stylesEndStrategy(matches, template, $); break;
+        case 'htmltag_start': return stylesStartStrategy(matches, template, $); break;
+        case 'htmltag_headstart': return stylesHeadStartStrategy(matches, template, $); break;
+        case 'htmltag_headend': return stylesHeadEndStrategy(matches, template, $); break;
+        case 'htmltag_bodystart': return stylesBodyStartStrategy(matches, template, $); break;
+        case 'htmltag_bodyend': return stylesBodyEndStrategy(matches, template, $); break;
+        case 'htmltag_beforeelem': return stylesBeforeCurrentStrategy(matches, template, $); break;
+        case 'htmltag_afterelem': return stylesAfterCurrentStrategy(matches, template, $); break;
+        default: return css; break;
+    }
+}
