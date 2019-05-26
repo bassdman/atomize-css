@@ -29,6 +29,7 @@
   "homepage": "https://github.com/bassdman/cssar#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
+    "css": "^2.2.4",
     "fs-extra": "^7.0.1",
     "less": "^3.9.0"
   }
