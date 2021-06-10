@@ -2,9 +2,10 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const basicRules = require('./rules/rules_basic');
-const { outputplugin } = require('./plugins/postprocess-plugin');
+const { defaultPostprocessing: defaultPostprocessingPlugin } = require('./plugins/default-postprocess-plugin');
 const { cssparseplugin } = require('./plugins/css-parse-plugin')
 const { applyRules } = require('./plugins/apply-rules-plugin');
+const { genericClassesPlugin } = require('./plugins/css-generic-classes-plugin');
 
 module.exports = async function (initialConf = {}) {
     if (initialConf.src == undefined)
@@ -13,7 +14,7 @@ module.exports = async function (initialConf = {}) {
     const defaults = {
         rules: '',
         preprocess: function({rules}){return rules;},
-        postprocess: function({output}){return output;}
+        postprocess: function(config){console.log('cnf',config);return config.output;}
     };
     const config = Object.assign({}, defaults, initialConf);
     const template = await fs.readFile(config.src, 'UTF-8');
@@ -21,9 +22,11 @@ module.exports = async function (initialConf = {}) {
     
     const rules = basicRules.concat(preprocessedCss);
     const parsedRules = cssparseplugin(rules);
-    const outputRules = applyRules(parsedRules,template)
+    const parsedRulesGeneric = genericClassesPlugin({rules:parsedRules,template});
+    const outputRules = applyRules(parsedRulesGeneric,template)
     const output = await postprocess(outputRules,config.postprocess,template);
     
+    console.log('output',output)
     if (config.dest)
         writeOutputToFile(config.dest, output);
 }
@@ -34,7 +37,7 @@ async function preprocess(preprocessors,rules,template){
 
         let modifiedRules = rules;
         for(processor of preprocessors){
-            modifiedRules = await Promise.resolve(processor({rules: rules, template: template}));
+            modifiedRules = await Promise.resolve(processor({rules: modifiedRules, template: template}));
         }
         return modifiedRules;
 }
@@ -49,11 +52,13 @@ async function postprocess(matches, outputEntries, template) {
         outputEntries = [outputEntries];
 
     for(entry of outputEntries){
+        console.log('outputy')
         if (typeof entry == 'function')
-            output = await Promise.resolve(outputEntries.apply(this, { matches, template, output, outputEntry: entry }));
+            output = await Promise.resolve(entry({ matches, template, output: output, outputEntry: entry }));
         else 
-            output = await Promise.resolve(outputplugin({ matches, template, output, outputEntry: entry }));
+            output = await Promise.resolve(defaultPostprocessingPlugin({ matches, template, output, outputEntry: entry }));
     }
+    console.log('outputx',output)
     return output;
 }
 

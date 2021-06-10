@@ -1,7 +1,6 @@
 const cheerio = require('cheerio');
 
 exports.applyRules = function(rules,template) {
-    console.log(rules)
     const $ = cheerio.load(template);
     const matchingRules = [];
 

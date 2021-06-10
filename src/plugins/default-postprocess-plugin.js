@@ -55,7 +55,7 @@ function stylesAfterCurrentStrategy(matches, template, $) {
     return $.html(':root');
 }
 
-exports.outputplugin = function({matches,template,$,css,outputEntry}) {
+exports.defaultPostprocessing = function({matches,template,$,css,outputEntry}) {
     switch (outputEntry) {
         case 'htmltag_end': return stylesEndStrategy(matches, template, $); break;
         case 'htmltag_start': return stylesStartStrategy(matches, template, $); break;

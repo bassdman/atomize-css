@@ -4,18 +4,10 @@ exports.cssparseplugin = function (config) {
     if (typeof config == 'string')
         config = { rules: config };
 
-    /*format: key: selector, value: 
-    {
-        selector: ['values1','values2']
-        ".ab": ['margin:auto;display:none;','visibility:hidden;']
-        ".de": ['border.red']
-    }
-    */
     const rules = {};
 
     const ast = parser.parse(config.rules);
 
-    console.log(config.rules)
     ast.stylesheet.rules.forEach(rule => {
         if (!rule.selectors)
             return;
@@ -50,6 +42,7 @@ function getValue(rule, selector) {
     let retVal = {
         value: '{',
         properties: {},
+        selectorRaw: selector,
         selector
     };
 
@@ -60,6 +53,7 @@ function getValue(rule, selector) {
     });
 
     retVal.value += '}';
+    retVal.valueRaw = retVal.value;
     retVal.style = selector + retVal.value;
 
     return retVal;

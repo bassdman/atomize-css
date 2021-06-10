@@ -4,6 +4,13 @@ module.exports = `
     .displayBlock{display:block;}
 
     @media (min-width: 50em) { /* Breite beträgt mindestens 50em */ }
+
+    .display(@type){display:@type}
+    .background(@color){color: @color;}
+    .border(@bd){border: @bd;}
+    .border(@width,@type,@color){border: @width @type @color;}
+    .visibility(@visibility){visibility: @visibility}
+    .margin(@margin){margin: @margin;}
 `
 /*    'width(#width)': '.#selector{width: #width;}',
     'content(#content)': 'content: "#content"',
