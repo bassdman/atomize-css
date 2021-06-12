@@ -1,36 +1,38 @@
 {
-  "name": "cssar",
-  "version": "0.1.0",
-  "description": "Parse classes in html - no more large css-files",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bassdman/cssar.git"
-  },
-  "bin": {
-    "cssar": "./bin/index.js"
-  },
-  "keywords": [
-    "atomize",
-    "atomizer",
-    "css",
-    "cssar",
-    "atomize-css",
-    "cäsar"
-  ],
-  "author": "Manuel Gelsen",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/bassdman/cssar/issues"
-  },
-  "homepage": "https://github.com/bassdman/cssar#readme",
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.3",
-    "css": "^2.2.4",
-    "fs-extra": "^7.0.1",
-    "less": "^3.9.0"
-  }
+    "name": "cssar",
+    "version": "0.1.0",
+    "description": "Parse classes in html - no more large css-files",
+    "main": "src/index.js",
+    "scripts": {
+        "test": "node ./test.mjs",
+        "build": "parcel build src/index.mjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bassdman/cssar.git"
+    },
+    "bin": {
+        "cssar": "./bin/index.js"
+    },
+    "keywords": [
+        "atomize",
+        "atomizer",
+        "css",
+        "cssar",
+        "atomize-css",
+        "cäsar"
+    ],
+    "author": "Manuel Gelsen",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/bassdman/cssar/issues"
+    },
+    "homepage": "https://github.com/bassdman/cssar#readme",
+    "dependencies": {
+        "cheerio": "^1.0.0-rc.3",
+        "css": "^2.2.4",
+        "fs-extra": "^7.0.1",
+        "map-stream": "^0.0.7",
+        "vinyl-fs": "^3.0.3"
+    }
 }
